@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/MAPORTER16/cse340-course-repo#readme",
   "dependencies": {
+    "ejs": "^7.0.2",
     "express": "^5.3.0"
   },
   "devDependencies": {
