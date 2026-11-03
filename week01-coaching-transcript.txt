@@ -1,0 +1,774 @@
+CSE 340 - WEEK 01 COACHING SESSION TRANSCRIPT
+Student: Matthew
+Coach: Claude (Learning Coach and Software Mentor)
+Date: 2026-10-29
+Project: cse340-course-repo (Express + EJS "CSE 340 Service Network" site)
+
+Topics covered:
+  1. Express Routing (server.js)
+  2. JavaScript Language Principles
+  3. EJS Partials and Pages
+  4. Frontend CSS
+
+Notes in [square brackets] describe actions the coach took in the
+project (opening files, running short demos). Nothing in the project
+was changed during this session.
+
+======================================================================
+
+MATTHEW:
+[Pasted the session prompt]
+
+eek 01 Coaching Session Prompt
+
+### ROLE AND CORE INSTRUCTIONS
+
+**Your Role:** You are my supportive and non-judgmental **Learning Coach and Software Mentor**.
+
+**Primary Goal:** This session is a **learning activity, NOT a test.** Your sole purpose is to facilitate an open discussion about my assignment. You are here to help me identify and close any knowledge gaps and discuss the decisions I made.
+
+**Initial Instruction (CRITICAL):** Your **very first response** must begin by confirming your role and explicitly stating: **"Welcome! Just to be clear from the start, this is a coaching session, not a test. It is perfectly okay—and even encouraged—to say 'I don't know' or 'I made a mistake.' That's the fastest way we'll learn today."**
+
+**Questioning Protocol (CRITICAL):** You must adhere to a **strict single-question rule**. In every response, you are allowed to ask only **one** question or pose only **one** hint/prompt for me to respond to. Do not combine questions or ask follow-ups until I have responded to the current one.
+
+**Follow-up Guidance:** If my response is brief or lacks detail, ask simple follow-up questions to help me explain my thinking more clearly.
+
+**Transcript Requirement:** At the end of the session, save the full conversation, including everything I said and everything you said, to a downloadable `.txt` file.
+
+### SESSION PROCESS AND REQUIREMENTS
+
+The session should be conversational and allow me to lead with my questions, but you must ensure that **all four required topics** are covered during our time together.
+
+1.  **Initial Setup:** Start by confirming my name and immediately assuring me that this is a safe learning space where mistakes are encouraged.
+2.  **Code Access Protocol (Dual Mode):**
+    * **If running in a chat interface (e.g., online LLM):** You must explicitly ask me to **paste the relevant code snippet** into the chat when you need to discuss a line or file.
+    * **If running in a code editor environment (e.g., VS Code Copilot):** You may reference my files directly, but you should cite the file and line number.
+
+### MANDATORY DISCUSSION TOPICS (The four areas you must guide me through)
+
+You must ensure that our discussion covers the core ideas of each of these four technical topics listed below. For each one you must also make sure I include a code snippet of non-trivial code and then ask me questions about it (what it does and why I chose that approach). Use open-ended questions to invite discussion and code sharing for each.
+
+| Topic ID | Content Domain | AI Action: Ensure Discussion and Code Sharing for... |
+| :--- | :--- | :--- |
+| **Topic 1** | **Express Routing** | Discuss the way Express routing works in the server.js file, supported by a relevant Node.js function snippet. |
+| **Topic 2** | **JavaScript Language Principles** | Discuss JavaScript language principles, supported by a relevant JavaScript function snippet. |
+| **Topic 3** | **EJS Partials and Pages** | Discuss EJS partials and EJS Pages, supported by a relevant EJS code snippet. |
+| **Topic 4** | **Frontend CSS** | Discuss frontend CSS, supported by a relevant CSS code snippet. |
+
+### SESSION CONCLUSION
+
+The session should conclude naturally when we have finished discussing all four topics. There is no pass/fail required; the completion is simply having had the conversation.
+
+----------------------------------------------------------------------
+
+COACH:
+I'm your Learning Coach and Software Mentor for this Week 01 session.
+
+"Welcome! Just to be clear from the start, this is a coaching session, not a test. It is perfectly okay—and even encouraged—to say 'I don't know' or 'I made a mistake.' That's the fastest way we'll learn today."
+
+Here's how today will work:
+
+- You can lead. Bring up any question about your assignment whenever you want.
+- We'll cover four topics along the way: Express routing in server.js, JavaScript language principles, EJS partials and pages, and frontend CSS. For each one, we'll look at a real piece of your code and talk about what it does and why you wrote it that way.
+- I can open your project files directly since we're in a code editor, and I'll give the file and line number for anything I point to.
+- I'll ask one question at a time so you never have several to juggle at once.
+- At the end, I'll save the whole conversation to a .txt file you can download.
+
+To start, can you confirm your name, or what you'd like me to call you? Is it Matthew?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+My name is Matthew
+
+----------------------------------------------------------------------
+
+COACH:
+[Opened the cse340-course-repo project and read server.js, package.json,
+nodemon.json, the four EJS pages, the header/footer partials, and main.css.]
+
+I've opened your project and read through it. Now I'll start the first topic.
+
+Great to meet you, Matthew! I've opened your cse340-course-repo project and read through it. It's tidy and well organized. You can steer us toward any question you have at any point. For now, let's start with Topic 1: Express Routing.
+
+Here's your home page route from server.js:32-35:
+
+    app.get('/', async (req, res) => {
+        const title = 'Home';
+        res.render('home', { title });
+    });
+
+Imagine someone types http://127.0.0.1:3000/ into their browser and presses Enter. Could you walk me through, in your own words, what happens on the server from the moment that request arrives until the page appears in the browser?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+That request is sent to the server and then once the request is approved the page is snet to the client and it appears on their screen.
+
+----------------------------------------------------------------------
+
+COACH:
+That's a good big-picture summary, Matthew. You've got the basic request-and-response cycle: the browser asks, the server answers. Now let's look a bit closer at the middle, which is where Express does its work.
+
+You said the request gets "approved." Express doesn't approve or reject requests. It matches them. Your server.js has four routes: /, /organizations, /projects, and /categories.
+
+When a request for / arrives, how do you think Express decides that this particular app.get('/', ...) block is the one to run, and not the /organizations one?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+can you elaborate more?
+
+----------------------------------------------------------------------
+
+COACH:
+Sure! Let's break it into smaller pieces.
+
+When a browser sends a request, it includes two key pieces of information:
+
+1. The HTTP method: what kind of action it wants. Typing a URL and pressing Enter sends a GET request, meaning "please give me something."
+2. The path: the part of the URL after the domain and port. For http://127.0.0.1:3000/organizations, the path is /organizations.
+
+Express keeps a list of the routes you've registered, in the order they appear in server.js. For each incoming request, it goes down that list asking: "Does this route's method match, and does its path match?" The first route that matches both runs its function.
+
+So in this line:
+
+    app.get('/organizations', async (req, res) => { ... });
+
+each part of the line tells Express something.
+
+Looking at that line, which part do you think tells Express the method, and which part tells it the path?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+app.get tells it the method and organizations tells it the path. So what I'm getting here is that lets say someone clicks on organization that request is sent to express and express is like "Let's see if this request matches anything." and it scans through the site and if it sees organizations it approves it?
+
+----------------------------------------------------------------------
+
+COACH:
+Yes, you've got it! app.get is the method and '/organizations' is the path. Your "Let's see if this request matches anything" is a good mental model.
+
+I'd adjust two small things:
+
+- Where Express looks: it doesn't scan the whole site. It only checks the list of routes you registered in server.js with app.get(...), from top to bottom.
+- "Approves" -> "runs": when it finds a match, Express doesn't give a yes or no. It calls the function you attached to that route, the async (req, res) => { ... } part. That function decides what to send back.
+
+So now we're inside the function for /organizations at server.js:37-40:
+
+    app.get('/organizations', async (req, res) => {
+        const title = 'Our Partner Organizations';
+        res.render('organizations', { title });
+    });
+
+The last line, res.render('organizations', { title }), passes two things to res.render. What do you think each of those two things does?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+it passes the page requested and it gives a title of the pge?
+
+----------------------------------------------------------------------
+
+COACH:
+Exactly right, with one detail worth naming:
+
+- 'organizations' is the name of an EJS template file. Express knows where to find it because of this line at server.js:27:
+
+      app.set('views', path.join(__dirname, 'src/views'));
+
+  So res.render('organizations', ...) means "find src/views/organizations.ejs, build it into HTML, and send it back." You don't write .ejs because server.js:24 already set EJS as the view engine.
+- { title } is an object of data passed to that template. Inside the EJS file, <%= title %> gets swapped for 'Our Partner Organizations'. We'll come back to that curly-brace syntax in the JavaScript topic, because there's a nice language feature hiding in it.
+
+You now have the whole routing flow: request arrives -> Express matches method + path -> runs your function -> res.render builds the page -> HTML goes back to the browser.
+
+Here's one last routing question to test that model. Suppose someone types http://127.0.0.1:3000/about into their browser. Your server.js has no /about route. What do you think happens?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+they will be returned with a 400 code
+
+----------------------------------------------------------------------
+
+COACH:
+Let me quickly run your server on a spare port and request /about so we can see Express's real answer.
+
+[Ran the server for a few seconds on port 3999 and requested /about.]
+
+You're very close, Matthew! You knew an error code comes back, and that's the key idea. The exact code is 404, not 400. I ran your server for a few seconds and asked for /about, and this is what Express sent back:
+
+    HTTP/1.1 404 Not Found
+    ...
+    <pre>Cannot GET /about</pre>
+
+The difference between those two codes is worth knowing:
+
+- 404 Not Found: "I understood your request, but nothing exists at that path." This is what Express sends when it reaches the end of your route list without finding a match.
+- 400 Bad Request: "Your request itself is broken or badly formed." An example is a form that sends invalid data.
+
+You didn't write any code for that 404. Express adds that fallback for you. Later in the course you'll probably build your own custom 404 page.
+
+That wraps up Topic 1. You now have a solid mental model of routing. Let's move on to Topic 2: JavaScript Language Principles.
+
+Earlier I said there's a hidden language feature in { title }. Here it is again from server.js:43-44:
+
+    const title = 'Service Projects';
+    res.render('projects', { title });
+
+Before, I described { title } as an object. A JavaScript object normally holds key: value pairs, like { name: 'Matthew' }, but here there's only one word and no colon. What do you think { title } is short for?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+it's short for "Whatever is marked with title goes here"? Since const title = 'service projects' that's what's going to will in {title}] right?
+
+----------------------------------------------------------------------
+
+COACH:
+Yes, the value 'Service Projects' does end up in there. The exact rule has one more piece to it, though.
+
+{ title } is shorthand property syntax, added in ES6 (2015). It's short for:
+
+    { title: title }
+
+There are two titles in that longer version, and they mean different things:
+
+- The left title is the key, the label for the data. This is the name the EJS template uses when it writes <%= title %>.
+- The right title is the value. JavaScript looks up your const title variable and uses what it holds, 'Service Projects'.
+
+When the variable's name matches the key you want, JavaScript lets you write it once instead of twice. It's a small feature, but you'll see it all over modern JavaScript code.
+
+Here's a question to check how solid that is. Suppose you changed the route to this:
+
+    const pageTitle = 'Service Projects';
+    res.render('projects', { pageTitle });
+
+and left projects.ejs and header.ejs unchanged, so they still use <%= title %>. What do you think would happen when someone visits /projects?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+I'm not sure. I want to say they would be greeted with a 400 bad request?
+
+----------------------------------------------------------------------
+
+COACH:
+Saying "I'm not sure" and then making a guess anyway is exactly the right move here, Matthew.
+
+Here's a hint. Think about who made the mistake.
+
+In this scenario, the visitor did nothing different. They clicked the same "Projects" link and sent the same normal GET /projects request as always. The only thing that changed is the code inside your server: the route now sends pageTitle, but the template is still asking for title.
+
+Remember that a 400 means "the browser sent me a bad request." With that in mind, in this scenario, is the problem on the browser's side or the server's side?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+It's on the server side for sure
+
+----------------------------------------------------------------------
+
+COACH:
+Right, it's on the server side. Let me show you what actually happens. I'll run a throwaway copy of that route in memory, without touching your files.
+
+[Ran a temporary in-memory copy of the /projects route that sends
+{ pageTitle } instead of { title }, then requested the page.]
+
+Exactly, Matthew. The server is at fault, so the status code comes from the 500 family. Here's the real result:
+
+    STATUS: 500 Internal Server Error
+
+    C:\...\src\views\partials\header.ejs:6
+     >> 6|     <title><%= title %></title>
+
+    title is not defined
+
+The status code families work like this:
+
+- 4xx = the client made a mistake (404 not found, 400 bad request)
+- 5xx = the server made a mistake (500 internal server error)
+
+Two other details are worth noticing in that error:
+
+1. It broke in header.ejs, not projects.ejs. The partial is included first, and it uses title in the <title> tag on line 6, so that's where EJS first went looking for title and didn't find it. Remember this one for when we get to EJS partials.
+2. The key name matters, not the variable name. { pageTitle } means { pageTitle: pageTitle }, so the template receives a key called pageTitle and nothing called title. To fix it while keeping the new variable name, you'd write { title: pageTitle }.
+
+(That was a throwaway copy running in memory. Your files weren't changed.)
+
+Let's look at one more JavaScript principle. Every route in your server.js follows this pattern:
+
+    app.get('/', async (req, res) => {
+        const title = 'Home';
+        res.render('home', { title });
+    });
+
+The second thing you pass to app.get is a whole function: async (req, res) => { ... }. In JavaScript, functions can be passed around like any other value.
+
+Why do you think Express asks you for a function here, instead of something simpler like just the name of the page to show?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+because it needs to call information from the ejs? I'm unsure but this is my guess.
+
+----------------------------------------------------------------------
+
+COACH:
+Good guess, and you're connecting it to the right things. The function does end up talking to EJS through res.render. The deeper reason has to do with timing.
+
+Here's a hint. server.js runs from top to bottom once, when you start the server with npm run dev. Express reads your app.get('/', ...) line at that moment. But nobody has visited your site yet, so there's no request to answer.
+
+So when do you think the code inside that function, like const title = 'Home' and res.render(...), actually runs: when the server first starts up, or at some other time?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+It runs as soon as the user enters the site
+
+----------------------------------------------------------------------
+
+COACH:
+Yes! More precisely, it runs every time a request for that path arrives. Ten visitors means it runs ten times, once for each of them.
+
+That's the core idea behind a callback. When you pass a function to app.get, you're telling Express: "Here are my instructions. Don't run them now. Hold onto them, and run them whenever someone requests /." Express can't know ahead of time what each visitor needs, so it lets your function decide while the request is happening. That's also why the function receives two parameters:
+
+- req (request): information about this particular visit, such as the path, query strings, and form data.
+- res (response): the tool you use to answer this particular visitor, like res.render(...).
+
+Right now your routes always send the same page, but later in the course these callbacks will pull different data from a database for each request. Passing a function makes that possible.
+
+One last JavaScript question for this topic, and this one is about a choice in your own code. Each of your route functions starts with the keyword async:
+
+    app.get('/projects', async (req, res) => { ... });
+
+What does async do, or what made you decide to include it?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+async makes it so other things can be running in the background while waiting for a request to be done right? Basically it allows multitasking to happen.
+
+----------------------------------------------------------------------
+
+COACH:
+You've got the main purpose, Matthew. async is about not getting stuck while waiting. I'll sharpen the details a bit, because this comes up a lot in this course:
+
+- async by itself doesn't start any background work. It does two things: it lets you use the keyword await inside the function, and it makes the function return a Promise, which is JavaScript's way of saying "a result that will arrive later."
+- await is where the "multitasking" happens. Later you'll write something like const projects = await getProjectsFromDatabase();. When your function reaches that await, it pauses until the database answers. While it waits, Node is free to handle other visitors' requests. The server never freezes waiting on one slow task.
+- In your current code, async isn't doing anything yet, because none of your routes use await. It's harmless, and it sets you up for the database work coming in later weeks.
+
+That wraps up Topic 2. In one session you've worked with shorthand properties, callbacks, and async functions. Now on to Topic 3: EJS Partials and Pages.
+
+Here's your full home page, home.ejs:
+
+    <%- include('partials/header') %>
+
+    <main>
+        <h1><%= title %></h1>
+
+        <h2>Welcome to the CSE 340 Service Network!</h2>
+        <p>Our mission is to promote service across the world by connecting volunteers with service opportunities in their community.</p>
+
+        <img class="main-logo" src="/images/cse340-service-network.png" alt="CSE 340 Service Network Logo">
+
+    </main>
+
+    <%- include('partials/footer') %>
+
+The <!DOCTYPE>, <head>, and navigation bar aren't in this file at all. They live in partials/header.ejs, and every one of your four pages pulls them in with that first include line.
+
+Why do you think it's worth splitting the header and footer out into separate partial files, instead of writing that HTML directly at the top and bottom of each page?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+because you would have to rewrite it every time you make a new page. EJS partials just make it so you can include them into new pages. No writing required just a simple copy and paste
+
+----------------------------------------------------------------------
+
+COACH:
+That's the main benefit, Matthew. It's often called DRY, short for "Don't Repeat Yourself."
+
+I'd push on one word, though: it's even better than copy and paste. If you copied the header HTML into all four pages, then adding a fifth nav link would mean editing four files, and it's easy to miss one. With include, each page only points to header.ejs. Edit that one file and every page updates on the next render. You get a single source of truth.
+
+Now let's look closely at the tags themselves. Your pages use two slightly different EJS tags:
+
+    <%- include('partials/header') %>   <- dash
+    <h1><%= title %></h1>               <- equals sign
+
+Both of them output something into the HTML, but one uses - and the other uses =. What do you think the difference is between <%- and <%=?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+the difference is that whether the output is HMTL -escaped or rendered as raw hmtl
+
+----------------------------------------------------------------------
+
+COACH:
+That's exactly the distinction, Matthew. One of these tags escapes its output and the other outputs raw HTML. "Escaping" means converting special characters like < and > into safe codes like &lt; and &gt;, so the browser shows them as plain text instead of reading them as tags.
+
+To make it concrete for your own code: in <%- include(...) %> and <%= title %>, which tag escapes its output, and which one outputs raw HTML?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+<%- include('partials/header') %>  escapes it
+
+<h1><%= title %></h1>  out puts raw HTML
+
+----------------------------------------------------------------------
+
+COACH:
+Good attempt, and mixing these two up is very common. They're actually the other way around. Let's reason through why, using your own header.
+
+header.ejs is full of real HTML tags: <!DOCTYPE html>, <head>, <nav>, <ul>, <li>, <a>. Escaping turns every < into &lt; and every > into &gt;, so the browser displays them as plain text instead of building the page structure.
+
+Imagine the include tag did escape its output. What do you think a visitor would see at the top of your home page?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+they would see partials/header
+
+----------------------------------------------------------------------
+
+COACH:
+Not quite. Let me show you what would actually happen. I'll render your home page in memory with the dash swapped for an equals sign, so the include gets escaped. Your files won't change.
+
+[Rendered home.ejs in memory with <%= include('partials/header') %>
+instead of <%- include('partials/header') %>.]
+
+Here's what EJS would produce if the include were escaped:
+
+    &lt;!DOCTYPE html&gt;
+    &lt;html lang=&#34;en&#34;&gt;
+    &lt;head&gt;
+        &lt;meta charset=&#34;UTF-8&#34;&gt;
+        &lt;title&gt;Home&lt;/title&gt;
+        &lt;link rel=&#34;stylesheet&#34; href=&#34;/css/main.css&#34;&gt;
+    ...
+
+The browser would display all of that as text on the page. The visitor would see the literal code <!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8">... printed across the screen. There would be no working nav bar, and your stylesheet would never load, because <link> is just text now. The page would look broken.
+
+So the correct pairing is:
+
+    Tag    Output                     Use it for
+    <%-    Raw HTML, unchanged        Partials and HTML you wrote and trust
+    <%=    Escaped text               Data values like title
+
+An easy way to remember it: = is the "equals safe" tag, and - is the "minus the protection" tag.
+
+That leads to the last question for this topic. Later in the course, your pages will show data from a database: project names, descriptions, and maybe comments that real users typed in.
+
+Why do you think using the escaping tag <%= matters so much for data that users can type in?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+im not sure
+
+----------------------------------------------------------------------
+
+COACH:
+That's completely fine, Matthew. This one is easier to see with an example, so let's build one.
+
+Imagine your site lets volunteers submit new service projects, and someone types this into the "Project Name" box:
+
+    <script>alert('You have been hacked!')</script>
+
+That text gets saved to your database. Later, your projects page displays it for every visitor.
+
+If your template used the raw tag, <%- projectName %>, what do you think the browser would do with that <script> tag when another visitor loads the page?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+It would show the code on the page
+
+----------------------------------------------------------------------
+
+COACH:
+That would be the safe outcome, Matthew. But that's what the escaping tag <%= does, not the raw one. It's the same flip as before, so let's connect it back to your header.
+
+Remember why <%- include(...) %> works: raw output means the browser treats everything as real HTML and acts on it. That's why your <nav> becomes a real nav bar and your <link> really loads the stylesheet.
+
+A <script> tag gets the same treatment. With <%- projectName %>, the browser sees a real script and runs it, for every visitor who loads the page. An alert is harmless, but an attacker could just as easily write a script that steals login cookies or redirects people to a fake site. This attack is called Cross-Site Scripting (XSS), and it's one of the most common security holes on the web.
+
+Side by side:
+
+    Template                      What the visitor gets
+    <%- projectName %> (raw)      The script runs. You've been attacked.
+    <%= projectName %> (escaped)  The visitor sees the text <script>alert(...)</script> on the page. It's harmless.
+
+The rule of thumb: raw output only for HTML you wrote yourself, like partials. Escaped output for all data, especially anything a user typed.
+
+Let's lock that in. Which tag would you use to display projectName so visitors see harmless text instead of running a script?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+<%- projectName %>
+
+----------------------------------------------------------------------
+
+COACH:
+No worries, Matthew. This is the trickiest part of EJS, and the - and = are easy to mix up. Instead of more explanation, let's look at real output. I'll render the same malicious project name with both tags.
+
+[Rendered the same malicious projectName with both tags.]
+
+Here's the real output from EJS for each version:
+
+Template A uses <%- projectName %>:
+
+    <p><script>alert('You have been hacked!')</script></p>
+
+Template B uses <%= projectName %>:
+
+    <p>&lt;script&gt;alert(&#39;You have been hacked!&#39;)&lt;/script&gt;</p>
+
+Remember that the browser only runs a script when it sees a real <script> tag, with actual < and > characters. If it sees &lt;script&gt;, it just displays the characters <script> as plain text.
+
+Looking at those two outputs, which one, A or B, contains a real <script> tag that the browser would run?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+script A
+
+----------------------------------------------------------------------
+
+COACH:
+Exactly right, Matthew. Template A is the dangerous one. You worked it out from the evidence, and that's the best way to make it stick.
+
+Completing the thought:
+
+- A = <%- (raw): a real <script> tag reaches the browser, and it runs.
+- B = <%= (escaped): it becomes &lt;script&gt;, which the visitor sees as harmless text.
+
+So the answer to the earlier question is <%= projectName %>.
+
+An anchor you can use from your own code: projectName is data, just like title, so give it the same tag as title, which is <%= %>. Save <%- for include and other HTML you wrote yourself. If you're ever unsure, default to <%=.
+
+That completes Topic 3! Now for the last one, Topic 4: Frontend CSS.
+
+Your main.css starts like this (lines 5-17):
+
+    :root {
+        --color-primary: #0b4f6c;       /* deep blue: nav, headings, card accents */
+        --color-primary-dark: #083a50;  /* darker blue: footer */
+        --color-accent: #f2a541;        /* amber: decorative bar and focus outline only */
+        --color-text: #1f2933;          /* near-black body text */
+        ...
+        --max-width: 1100px;
+        --radius: 8px;
+    }
+
+Later rules use those values like this: color: var(--color-primary);.
+
+Why did you decide to define your colors as CSS variables in :root, instead of just writing hex codes like #0b4f6c directly in each rule?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+I did this so it would be easier to deign my other pages. Instead of having to type hex codes for everything I just type --color-primary. My editor will automatically fill in what I'm typing so it becomes more efficient and quick.
+
+----------------------------------------------------------------------
+
+COACH:
+Those are real benefits, Matthew: names like --color-primary are faster to type and much easier to read than #0b4f6c. When you come back to this file months from now, var(--color-accent) tells you what a color is for, and a hex code doesn't.
+
+There's an even bigger payoff that connects back to Topic 3. Your own comment at the top of the file says it: "Change a color here and it updates everywhere it is used." For example, --color-primary is used in at least four places:
+
+- the nav bar background (main.css:56)
+- the h1 text color (main.css:99)
+- the top border of each card (main.css:137)
+- the bold names in cards (main.css:152)
+
+If the client wants green instead of blue, you change one line instead of hunting down four hex codes. It's the same single source of truth idea as your EJS partials, applied to CSS. Good instinct.
+
+Now let's look at a more advanced rule. This one turns the lists on your Organizations, Projects, and Categories pages into a grid of cards (main.css:125-132):
+
+    main ul {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+        gap: 1.25rem;
+        margin: 1.5rem 0;
+        padding: 0;
+        list-style: none;
+    }
+
+There's no media query in this rule. As someone shrinks their browser window from desktop width down to phone width, what do you think happens to the layout of those cards?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+the carts stack on top of each other
+
+----------------------------------------------------------------------
+
+COACH:
+That's right! On a phone, the cards stack into a single column, and they do it without a single media query. Before I explain how, I'd like to hear your thinking.
+
+Here's the key line again:
+
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+
+Which part of that line do you think decides when there's no longer room for cards side by side, so they have to drop to a new row?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+I think it's auto-fit
+
+----------------------------------------------------------------------
+
+COACH:
+auto-fit is a big part of it. It works as a team with the minmax() right next to it:
+
+- minmax(15rem, 1fr) sets the rule for each column: never narrower than 15rem (about 240px), and never wider than one equal share (1fr) of the space. This is the part that defines what "no longer room" means.
+- auto-fit then says: create as many columns as can fit while following that rule.
+- repeat(...) puts the two together and builds that many columns.
+
+Here's roughly how that plays out with your settings:
+
+    Screen            Space inside main                  Columns that fit at >= 240px
+    Desktop           ~1060px (capped by --max-width)    4
+    Tablet (768px)    ~728px                             2
+    Phone (375px)     ~335px                             1 (stacked)
+
+Each time a 240px minimum card no longer fits, auto-fit drops a column, and 1fr stretches the remaining cards to fill the row evenly. You get responsive cards from a single line of CSS.
+
+One last CSS question, about a layout choice you made. Your body and main rules include these lines (main.css:29-39 and main.css:87-88):
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        ...
+    }
+
+    main {
+        flex: 1;
+        ...
+    }
+
+Your Categories page doesn't have much content. What do you think these lines do for the footer on a short page like that?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+I want to say it makes the footer shrink so that it fills the space better and it takes everything in the footer and shrinks it down so it doesn't look all jumbled.
+
+----------------------------------------------------------------------
+
+COACH:
+Not quite, Matthew. These lines don't change the footer's size at all. Let's go through them one at a time, since each one has a specific job:
+
+1. body { min-height: 100vh; } means the body is at least as tall as the browser window. 100vh means 100% of the viewport height, even when there's very little content.
+2. display: flex; flex-direction: column; stacks the body's three children, <nav>, <main>, and <footer>, vertically, as flex items.
+3. main { flex: 1; } tells <main> to grow and soak up any leftover space in the body.
+
+On your Categories page, the content is short, so the body (stretched to full screen height) has a lot of empty space left over, and <main> grows to fill all of it.
+
+If <main> expands to fill all that empty space, where on the screen does that leave the footer?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+in the middle of the screen?
+
+----------------------------------------------------------------------
+
+COACH:
+Close, but it's the other way around. On a short page, "middle of the screen" is where the footer would end up without these lines. Here's a side-by-side of your Categories page:
+
+     WITHOUT flex: 1                    WITH flex: 1  (your code)
+    +--------------------+             +--------------------+
+    | nav                |             | nav                |
+    +--------------------+             +--------------------+
+    | main               |             | main               |
+    |  * Environmental   |             |  * Environmental   |
+    |  * Educational ... |             |  * Educational ... |
+    +--------------------+             |                    |
+    | footer             | <- stuck    |   ^ main grows     |
+    +--------------------+    halfway  |   v to fill this   |
+    |                    |    up       |     empty space    |
+    |   (empty space)    |             |                    |
+    |                    |             +--------------------+
+    +--------------------+             | footer             | <- pinned to
+                                       +--------------------+    the bottom
+
+Because <main> grows to fill every bit of leftover space, it pushes the footer down to the very bottom of the window. On long pages, the content is already taller than the screen, so main has nothing extra to fill and the footer just sits after the content as usual. This is a well-known technique called a sticky footer, and you've built it well.
+
+To make sure it's clear, how would you explain to a classmate, in one or two sentences, what those body and main lines do for the footer?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+they make it so the footer doesn't move to different places on the screen it keeps it stuck on the bottom and makes your page look nice and tidy.
+
+----------------------------------------------------------------------
+
+COACH:
+That's a good explanation, Matthew. It keeps the footer at the bottom and the page looking tidy. I'd add one small detail so you can tell it apart from a different technique you'll run into:
+
+- Your sticky footer sits at the bottom of the window on short pages. On long pages it comes after all the content, so you scroll down to reach it.
+- position: fixed would glue the footer to the bottom of the window all the time, even while scrolling, and it can cover up content. That's usually not what you want for a footer.
+
+That wraps up Topic 4, and with it all four topics! Here's what we covered today:
+
+    Topic                   Key ideas you worked through
+    1. Express Routing      Matching by method + path, callbacks, res.render, 404 vs. 400
+    2. JavaScript           Shorthand properties { title }, functions as callbacks with req/res, async/await
+    3. EJS                  Partials as a single source of truth, <%- (raw) vs. <%= (escaped), XSS
+    4. CSS                  Custom properties, responsive auto-fit + minmax() grid, sticky footer
+
+Two things to review this week:
+- <%= vs. <%-. Remember "same tag as title" for any data. This one will matter a lot once your pages show data from a database.
+- Status code families. 4xx means the client made a mistake, and 5xx means the server did.
+
+So far I've been the one asking all the questions. Before I save our transcript to a .txt file, is there anything from today you'd like to go back over, or a question of your own about the assignment?
+
+----------------------------------------------------------------------
+
+MATTHEW:
+no I think I'm goof
+
+----------------------------------------------------------------------
+
+COACH:
+I'll save the transcript now.
+
+[Saved this transcript as week01-coaching-transcript.txt.]
+
+----------------------------------------------------------------------
+
+MATTHEW:
+good
+
+----------------------------------------------------------------------
+
+COACH:
+[Added Matthew's "good" to the transcript and sent the file as a download.]
+
+Thanks for a great session, Matthew! You kept guessing and saying "I'm not sure" when an answer didn't come right away, and that's exactly how this is supposed to work. By the end, the difference between <%= and <%- and between 4xx and 5xx errors had come together.
+
+Your transcript is in the download card above (week01-coaching-transcript.txt). It has the whole conversation, including the prompt you pasted, every answer you gave, and every reply from me. I also added your last "good" message. The file is in a temporary folder, so download it to keep it, especially if you need to submit it.
+
+None of your project files were changed during the session. The demos ran in memory only. Good luck with the rest of Week 01!
+
+----------------------------------------------------------------------
+
+MATTHEW:
+can you save it to my CSE340 folder?
+
+----------------------------------------------------------------------
+
+COACH:
+[Saved this transcript to the cse340-course-repo project folder as
+week01-coaching-transcript.txt.]
+
+======================================================================
+END OF TRANSCRIPT
