@@ -40,3 +40,44 @@ VALUES (1, 'Community Playground Build', 'Help assemble a new accessible playgro
 	(3, 'Senior Center Game Night', 'Spend an evening playing games and visiting with seniors.', 'Rexburg Senior Center, Rexburg, ID', '2027-01-09'),
 	(3, 'After-School Tutoring', 'Tutor students in reading and math after school.', 'Madison Middle School, Rexburg, ID', '2027-02-20'),
 	(3, 'Community Blood Drive', 'Greet donors, run check-in, and serve refreshments at a community blood drive.', 'Manwaring Center, Rexburg, ID', '2027-03-27');
+
+-- Categories table
+CREATE TABLE category (
+category_id SERIAL PRIMARY KEY,
+name VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- Project/category relationship (many-to-many): a project can have many categories
+-- and a category can have many projects
+CREATE TABLE project_category (
+project_id INTEGER NOT NULL REFERENCES project(project_id) ON DELETE CASCADE,
+category_id INTEGER NOT NULL REFERENCES category(category_id) ON DELETE CASCADE,
+PRIMARY KEY (project_id, category_id)
+);
+
+-- Sample categories
+INSERT INTO category (name)
+VALUES ('Environmental'),
+	('Educational'),
+	('Community Service'),
+	('Health and Wellness'),
+	('Construction and Repair');
+
+-- Assign each project to at least one category
+-- (1 Environmental, 2 Educational, 3 Community Service, 4 Health and Wellness, 5 Construction and Repair)
+INSERT INTO project_category (project_id, category_id)
+VALUES (1, 5), (1, 3),
+	(2, 5), (2, 3),
+	(3, 5),
+	(4, 5), (4, 1),
+	(5, 5), (5, 4),
+	(6, 1),
+	(7, 1), (7, 2),
+	(8, 1),
+	(9, 2), (9, 1),
+	(10, 1), (10, 3),
+	(11, 3),
+	(12, 3),
+	(13, 3), (13, 4),
+	(14, 2),
+	(15, 4), (15, 3);
