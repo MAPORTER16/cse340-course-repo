@@ -1,5 +1,6 @@
 // Import any needed model functions
 import { getUpcomingProjects, getProjectDetails } from '../models/projects.js';
+import { getCategoriesByProjectId } from '../models/categories.js';
 
 // How many upcoming projects to show on the main projects page
 const NUMBER_OF_UPCOMING_PROJECTS = 5;
@@ -12,12 +13,21 @@ const showProjectsPage = async (req, res) => {
     res.render('projects', { title, projects });
 };
 
-const showProjectDetailsPage = async (req, res) => {
+const showProjectDetailsPage = async (req, res, next) => {
     const projectId = req.params.id;
     const project = await getProjectDetails(projectId);
+
+    // Send a 404 if no service project has this ID
+    if (!project) {
+        const err = new Error('Service Project Not Found');
+        err.status = 404;
+        return next(err);
+    }
+
+    const categories = await getCategoriesByProjectId(projectId);
     const title = 'Service Project Details';
 
-    res.render('project', { title, project });
+    res.render('project', { title, project, categories });
 };
 
 // Export any controller functions

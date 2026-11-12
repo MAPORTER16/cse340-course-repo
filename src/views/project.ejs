@@ -4,6 +4,13 @@
     <h1><%= title %></h1>
 
     <h2><%= project.title %></h2>
+
+    <ul class="tags" aria-label="Categories">
+        <% categories.forEach(category => { %>
+            <li><a href="/category/<%= category.category_id %>"><%= category.name %></a></li>
+        <% }); %>
+    </ul>
+
     <p><%= project.description %></p>
 
     <p><strong>Date:</strong> <%= project.date.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }) %></p>
