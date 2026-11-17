@@ -55,5 +55,40 @@ const createOrganization = async (name, description, contactEmail, logoFilename)
     return result.rows[0].organization_id;
 };
 
+/**
+ * Updates an existing organization in the database.
+ * @param {string} organizationId - The id of the organization to update.
+ * @param {string} name - The new name of the organization.
+ * @param {string} description - The new description of the organization.
+ * @param {string} contactEmail - The new contact email for the organization.
+ * @param {string} logoFilename - The new filename of the organization's logo.
+ * @returns {string} The id of the updated organization record.
+ */
+const updateOrganization = async (organizationId, name, description, contactEmail, logoFilename) => {
+    const query = `
+      UPDATE organization
+      SET name = $1, description = $2, contact_email = $3, logo_filename = $4
+      WHERE organization_id = $5
+      RETURNING organization_id;
+    `;
+
+    const queryParams = [name, description, contactEmail, logoFilename, organizationId];
+    const result = await db.query(query, queryParams);
+
+    // No row was updated, so no organization has this ID.
+    // Tag the error as a 404 so the global error handler shows the "not found" page
+    if (result.rows.length === 0) {
+        const err = new Error('Organization not found');
+        err.status = 404;
+        throw err;
+    }
+
+    if (process.env.ENABLE_SQL_LOGGING === 'true') {
+        console.log('Updated organization with ID:', organizationId);
+    }
+
+    return result.rows[0].organization_id;
+};
+
 // Export the model functions
-export { getAllOrganizations, getOrganizationDetails, createOrganization } // UPDATED
+export { getAllOrganizations, getOrganizationDetails, createOrganization, updateOrganization }
