@@ -1,5 +1,5 @@
 // Import any needed model functions
-import { getUpcomingProjects, getProjectDetails, createProject } from '../models/projects.js';
+import { getUpcomingProjects, getProjectDetails, createProject, updateProject } from '../models/projects.js';
 import { getCategoriesByProjectId } from '../models/categories.js';
 import { getAllOrganizations } from '../models/organizations.js';
 import { body, validationResult } from 'express-validator';
@@ -93,11 +93,70 @@ const processNewProjectForm = async (req, res) => {
     }
 };
 
+const showEditProjectForm = async (req, res, next) => {
+    const projectId = req.params.id;
+
+    // Get the current project data so the form can be filled in with it
+    const project = await getProjectDetails(projectId);
+
+    // Send a 404 if no service project has this ID (same as the details page)
+    if (!project) {
+        const err = new Error('Service Project Not Found');
+        err.status = 404;
+        return next(err);
+    }
+
+    // The form needs the list of organizations for its dropdown,
+    // so the project can be moved to a different organization
+    const organizations = await getAllOrganizations();
+    const title = 'Edit Service Project';
+
+    res.render('edit-project', { title, project, organizations });
+};
+
+const processEditProjectForm = async (req, res, next) => {
+    const projectId = req.params.id;
+
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // Loop through validation errors and flash them
+        errors.array().forEach((error) => {
+            req.flash('error', error.msg);
+        });
+
+        // Redirect back to the edit project form
+        return res.redirect(`/edit-project/${projectId}`);
+    }
+
+    // Extract form data from req.body
+    const { title, description, location, date, organizationId } = req.body;
+
+    try {
+        // Save the changes to the database
+        await updateProject(projectId, title, description, location, date, organizationId);
+
+        req.flash('success', 'Service project updated successfully!');
+        res.redirect(`/project/${projectId}`);
+    } catch (error) {
+        // No project has this ID: let the global error handler show the 404 page
+        if (error.status === 404) {
+            return next(error);
+        }
+
+        console.error('Error updating project:', error);
+        req.flash('error', 'There was an error updating the service project.');
+        res.redirect(`/edit-project/${projectId}`);
+    }
+};
+
 // Export any controller functions
 export {
     showProjectsPage,
     showProjectDetailsPage,
     showNewProjectForm,
     processNewProjectForm,
-    projectValidation
+    projectValidation,
+    showEditProjectForm,
+    processEditProjectForm
 };

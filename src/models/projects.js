@@ -108,5 +108,43 @@ const createProject = async (title, description, location, date, organizationId)
     return result.rows[0].project_id;
 }
 
+/**
+ * Updates an existing service project in the database.
+ * The organization id is part of the update so a project can be moved
+ * to a different organization.
+ * @param {string} projectId - The id of the project to update.
+ * @param {string} title - The new title of the project.
+ * @param {string} description - The new description of the project.
+ * @param {string} location - The new location of the project.
+ * @param {string} date - The new project date (YYYY-MM-DD).
+ * @param {string} organizationId - The id of the organization running the project.
+ * @returns {number} The id of the updated project record.
+ */
+const updateProject = async (projectId, title, description, location, date, organizationId) => {
+    const query = `
+      UPDATE project
+      SET title = $1, description = $2, location = $3, date = $4, organization_id = $5
+      WHERE project_id = $6
+      RETURNING project_id;
+    `;
+
+    const queryParams = [title, description, location, date, organizationId, projectId];
+    const result = await db.query(query, queryParams);
+
+    // No row was updated, so no project has this ID.
+    // Tag the error as a 404 so the global error handler shows the "not found" page
+    if (result.rows.length === 0) {
+        const err = new Error('Service Project Not Found');
+        err.status = 404;
+        throw err;
+    }
+
+    if (process.env.ENABLE_SQL_LOGGING === 'true') {
+        console.log('Updated project with ID:', projectId);
+    }
+
+    return result.rows[0].project_id;
+}
+
 // Export the model functions
-export { getAllProjects, getProjectsByOrganizationId, getUpcomingProjects, getProjectDetails, getProjectsByCategoryId, createProject }
+export { getAllProjects, getProjectsByOrganizationId, getUpcomingProjects, getProjectDetails, getProjectsByCategoryId, createProject, updateProject }
