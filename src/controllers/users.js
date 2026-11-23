@@ -1,6 +1,6 @@
 // Import any needed model functions
 import bcrypt from 'bcrypt';
-import { createUser } from '../models/users.js';
+import { createUser, authenticateUser } from '../models/users.js';
 
 // PostgreSQL error code for a UNIQUE constraint violation
 // (each email address can only be registered once)
@@ -35,8 +35,8 @@ const processUserRegistrationForm = async (req, res) => {
 
         await createUser(name, email, passwordHash);
 
-        req.flash('success', 'Registration successful!');
-        res.redirect('/');
+        req.flash('success', 'Registration successful! Please log in.');
+        res.redirect('/login');
     } catch (error) {
         if (error.code === UNIQUE_VIOLATION) {
             req.flash('error', 'An account with that email already exists.');
@@ -48,8 +48,63 @@ const processUserRegistrationForm = async (req, res) => {
     }
 };
 
+const showLoginForm = (req, res) => {
+    const title = 'Login';
+
+    res.render('login', { title });
+};
+
+const processLoginForm = async (req, res) => {
+    const password = req.body?.password;
+    const email = req.body?.email?.trim().toLowerCase();
+
+    if (!email || !password) {
+        req.flash('error', 'Invalid email or password.');
+        return res.redirect('/login');
+    }
+
+    try {
+        const user = await authenticateUser(email, password);
+
+        if (user) {
+            // Store the user (without the password hash) in the session
+            req.session.user = user;
+            req.flash('success', 'Login successful!');
+
+            if (res.locals.NODE_ENV === 'development') {
+                console.log('User logged in:', user);
+            }
+
+            res.redirect('/');
+        } else {
+            // Same message for a wrong email or a wrong password, so the form
+            // doesn't reveal which email addresses have accounts
+            req.flash('error', 'Invalid email or password.');
+            res.redirect('/login');
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        req.flash('error', 'An error occurred during login. Please try again.');
+        res.redirect('/login');
+    }
+};
+
+const processLogout = (req, res) => {
+    // Remove the user from the session instead of destroying the whole session,
+    // because the flash message below is stored in the session
+    if (req.session.user) {
+        delete req.session.user;
+    }
+
+    req.flash('success', 'Logout successful!');
+    res.redirect('/login');
+};
+
 // Export any controller functions
 export {
     showUserRegistrationForm,
-    processUserRegistrationForm
+    processUserRegistrationForm,
+    showLoginForm,
+    processLoginForm,
+    processLogout
 };
