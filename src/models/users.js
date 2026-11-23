@@ -31,16 +31,18 @@ const createUser = async (name, email, passwordHash) => {
 };
 
 /**
- * Finds a user by email address.
+ * Finds a user by email address, including the name of the user's role.
  * Only used inside this file, so it is not exported.
  * @param {string} email - The email address to look up.
- * @returns {object|null} The user record (including password_hash), or null if not found.
+ * @returns {object|null} The user record (including password_hash and role_name), or null if not found.
  */
 const findUserByEmail = async (email) => {
+    // Join roles so the session gets the role name (e.g. 'admin') instead of a role_id number
     const query = `
-        SELECT user_id, name, email, password_hash, role_id
-        FROM users
-        WHERE email = $1;
+        SELECT u.user_id, u.name, u.email, u.password_hash, r.role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.role_id
+        WHERE u.email = $1;
     `;
     const queryParams = [email];
 
