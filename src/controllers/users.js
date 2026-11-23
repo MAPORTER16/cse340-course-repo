@@ -75,7 +75,7 @@ const processLoginForm = async (req, res) => {
                 console.log('User logged in:', user);
             }
 
-            res.redirect('/');
+            res.redirect('/dashboard');
         } else {
             // Same message for a wrong email or a wrong password, so the form
             // doesn't reveal which email addresses have accounts
@@ -100,11 +100,32 @@ const processLogout = (req, res) => {
     res.redirect('/login');
 };
 
+/**
+ * Middleware for routes that require a logged-in user.
+ * Sends visitors who are not logged in to the login page.
+ */
+const requireLogin = (req, res, next) => {
+    if (!req.session || !req.session.user) {
+        req.flash('error', 'You must be logged in to access that page.');
+        return res.redirect('/login');
+    }
+    next();
+};
+
+const showDashboard = (req, res) => {
+    const { name, email } = req.session.user;
+    const title = 'Dashboard';
+
+    res.render('dashboard', { title, name, email });
+};
+
 // Export any controller functions
 export {
     showUserRegistrationForm,
     processUserRegistrationForm,
     showLoginForm,
     processLoginForm,
-    processLogout
+    processLogout,
+    requireLogin,
+    showDashboard
 };
