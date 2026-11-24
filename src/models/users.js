@@ -89,5 +89,23 @@ const authenticateUser = async (email, password) => {
     return user;
 };
 
+/**
+ * Gets every registered user with the name of their role.
+ * Password hashes are never selected, so they can't end up in a page.
+ * @returns {object[]} The users (user_id, name, email, role_name), sorted by name.
+ */
+const getAllUsers = async () => {
+    const query = `
+        SELECT u.user_id, u.name, u.email, r.role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.role_id
+        ORDER BY u.name, u.email;
+    `;
+
+    const result = await db.query(query);
+
+    return result.rows;
+};
+
 // Export the model functions
-export { createUser, authenticateUser };
+export { createUser, authenticateUser, getAllUsers };
