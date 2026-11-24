@@ -1,6 +1,6 @@
 // Import any needed model functions
 import bcrypt from 'bcrypt';
-import { createUser, authenticateUser } from '../models/users.js';
+import { createUser, authenticateUser, getAllUsers } from '../models/users.js';
 
 // PostgreSQL error code for a UNIQUE constraint violation
 // (each email address can only be registered once)
@@ -127,10 +127,10 @@ const requireRole = (role) => {
             return res.redirect('/login');
         }
 
-        // Logged in, but without the required role
+        // Logged in, but without the required role: back to their dashboard
         if (req.session.user.role_name !== role) {
             req.flash('error', 'You do not have permission to access that page.');
-            return res.redirect('/');
+            return res.redirect('/dashboard');
         }
 
         next();
@@ -138,10 +138,17 @@ const requireRole = (role) => {
 };
 
 const showDashboard = (req, res) => {
-    const { name, email } = req.session.user;
+    const { name, email, role_name } = req.session.user;
     const title = 'Dashboard';
 
-    res.render('dashboard', { title, name, email });
+    res.render('dashboard', { title, name, email, role: role_name });
+};
+
+const showUsersPage = async (req, res) => {
+    const users = await getAllUsers();
+    const title = 'Registered Users';
+
+    res.render('users', { title, users });
 };
 
 // Export any controller functions
@@ -153,5 +160,6 @@ export {
     processLogout,
     requireLogin,
     requireRole,
-    showDashboard
+    showDashboard,
+    showUsersPage
 };
